@@ -11,6 +11,8 @@ const chatterBotContainerStyle = {
   width: '302px',
 }
 
+const ENTER_KEY = 13;
+
 const ChatterBotChat = (props) => (
   <div
     className="chatter-bot__container"
@@ -27,6 +29,11 @@ const ChatterBotChat = (props) => (
       variant="outlined"
       value={props.outgoingMessage}
       onChange={props.updateMessage}
+      onKeyDown={(event) => {
+        if (event.keyCode === ENTER_KEY && !event.shiftKey) {
+          props.sendMessage();
+        }
+      }}
     />
     <Button
       color="primary"
@@ -37,17 +44,26 @@ const ChatterBotChat = (props) => (
     <Divider style={{ margin: '12px 0' }}/>
     <List>
       {
-        props.messages.map((item, idx) => (
-          <ListItem key={idx}>
-            <ListItemText
+        props.messages.map((item, idx) => {
+          const isSelf = item.sender === props.myName;
+          return(
+            <ListItem
+              key={idx}
               style={{
-                textAlign: item.sender === props.myName ? 'right' : 'left',
+                textAlign: isSelf ? 'right' : 'left',
+                borderRadius: '5px',
+                border: `1px solid ${isSelf ? 'green' : 'red'}`,
+                background: `linear-gradient(${isSelf ? 'green' : 'grey'}80%, ${isSelf ? 'lightgreen' : 'lightgrey'}90%, white)`,
+                margin: '12px 0',
               }}
-              primary={item.message}
-              secondary={item.sender}
-            />
-          </ListItem>
-        ))
+            >
+              <ListItemText
+                primary={item.message}
+                secondary={item.sender}
+              />
+            </ListItem>
+          )
+        })
       }
     </List>
   </div>
